@@ -117,8 +117,7 @@
 
     .entropy-container p {
         font-size:  12px;
-        margin: 0;
-        margin-bottom: 8px;
+        margin: 8px 0;
     }
 
     .entropy {
@@ -127,6 +126,23 @@
         width: 100%;
         border-radius: 5px;
     }
+
+    .name-container {
+        display: flex;
+        gap: 10px; /* space between inputs */
+        align-items: center;
+    }
+
+    .name-container input {
+        flex: 1; /* make both inputs equal width */
+        max-width: 41%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
 
 
   </style>
@@ -137,11 +153,15 @@
     <h2>Sonnaz Group</h2>
     <h3>Create an account</h3>
     <form action="#" method="post" id="signupForm">
-        <input type="text" id="nameInput" name="name" placeholder="Name" required>
+        <div class="name-container">
+            <input type="text" id="firstNameInput" name="firstName" placeholder="First Name" required>
+            <input type="text" id="lastNameInput" name="lastName" placeholder="Last Name" required>
+        </div>
         <input type="text" id="emailInput" name="email" placeholder="Email" required>
         <p class="check" id ="emailCheck">❌ Invalid Email Address</p>
         <div class="padding"></div>
         <input type="text" id="username" name="username" placeholder="Username" required>
+        <p class="check" id ="usernameCheck">❌ Invalid Username</p>
         <input type="password" id="passwordInput" name="password" placeholder="Password" required>
         <p class="check" id ="passwordCheck-Length">❌ Password must be 12 characters minimum</p>
         <p class="check" id ="passwordCheck-Forbidden">❌ Password can't contain prohibited items</p>
@@ -152,6 +172,9 @@
         <div class="entropy-container" id="entropy-Container">
             <p id="entropy-words">Very Weak</p>
             <div class="entropy" id ="entropy-bar"></div>
+            <p class="check" id ="passwordCheck-Word">⚠️ Password contains a word</p>
+            <p class="check" id ="passwordCheck-Repeat">⚠️ Password contains a repeat sequence</p>
+            <p class="check" id ="passwordCheck-Sequential">⚠️ Password contains a sequential sequence</p>
         </div>
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
         <p class="check" id ="passwordCheck-Confirm">❌ Password must match</p>
@@ -162,6 +185,44 @@
   </div>
 
   <script>
+
+    let words = {};
+
+    fetch("words_dictionary.json")
+    .then(response => response.json())
+    .then(data => {
+        words = data;
+    })
+    .catch(error => console.error("Error loading words.json:", error));
+
+    function containsDictionaryWord(password, words) {
+        const lowerPass = password.toLowerCase();
+
+        for (let word in words) {
+            if (word.length >= 4 && lowerPass.includes(word)) {
+            return word; // return the word that was found
+            }
+        }
+        return null; // no match
+    }
+
+    function hasSequential(str) {
+        const s = str.toLowerCase();
+        let count = 0;
+
+        for (let i = 0; i < s.length - 2; i++) {
+            const a = s.charCodeAt(i);
+            const b = s.charCodeAt(i + 1);
+            const c = s.charCodeAt(i + 2);
+
+            // ascending sequence
+            if (b === a + 1 && c === b + 1) {
+                count++;
+                i += 2; // skip ahead so overlapping sequences counted separately
+            }
+        }
+        return count >= 2; // at least 2 sequences of length 3+
+    }
 
     function getGradientColor(percent) {
         let r, g, b = 0;
@@ -180,9 +241,11 @@
     }
 
     const form = document.getElementById("signupForm")
-    const name = document.getElementById("nameInput")
+    const firstName = document.getElementById("firstNameInput")
+    const lastName = document.getElementById("lastNameInput")
     const email = document.getElementById("emailInput")
     const emailCheckMessage = document.getElementById("emailCheck")
+    const usernameCheckMessage = document.getElementById("usernameCheck")
     const username = document.getElementById('username')
     const password = document.getElementById('passwordInput')
     const confirmPassword = document.getElementById('confirmPassword')
@@ -194,13 +257,17 @@
     const passwordCheckNumber = document.getElementById("passwordCheck-Number");
     const passwordCheckSpecial = document.getElementById("passwordCheck-Special");
     const passwordCheckConfirm = document.getElementById("passwordCheck-Confirm");
+    const passwordCheckWord = document.getElementById("passwordCheck-Word");
+    const passwordCheckRepeat = document.getElementById("passwordCheck-Repeat");
+    const passwordCheckSequential = document.getElementById("passwordCheck-Sequential");
     const entropyContainer = document.getElementById("entropy-Container")
     const entropyBar = document.getElementById("entropy-bar")
     const entropyWords = document.getElementById("entropy-words")
     const createButton = document.getElementById("create-Button")
 
     function validateForm() {
-        const nameValue = name.value;
+        const firstNameValue = firstName.value;
+        const lastNameValue = lastName.value;
         const emailValue = email.value;
         const usernameValue = username.value;
         const passwordValue = password.value;
@@ -215,10 +282,11 @@
         const minPasswordLength = 12;
 
         // Name check
-        const nameValid = nameValue.length > 0;
+        const firstNameValid = firstNameValue.length > 0;
+        const lastNameValid = lastNameValue.length > 0;
 
         // Username check
-        const usernameValid = usernameValue.length > 0;
+        const usernameValid = usernameValue.length > 0 && !forbiddenPattern.test(usernameValue);
 
         // Email check
         const emailIsValid = emailPattern.test(emailValue);
@@ -243,7 +311,7 @@
         const passwordsMatch = passwordValue === confirmPasswordValue;
 
         // Final result: all conditions met
-        const isValid = emailIsValid && passwordIsValid && passwordsMatch  && nameValid && usernameValid;
+        const isValid = emailIsValid && passwordIsValid && passwordsMatch  && firstNameValid && lastNameValid && usernameValid;
 
         if (isValid) {
             createButton.disabled = false;
@@ -283,181 +351,212 @@
     }
 
 
+    firstName.addEventListener("input", function() {
+        const val = firstName.value;
+
+        validateForm();
+
+    });
+
+    lastName.addEventListener("input", function() {    
+        const val = lastName.value;
+
+        validateForm();
+
+    });
+
     email.addEventListener("input", function() {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
         
         if (email.value.length === 0) {
             email.classList.remove("error");
             emailCheckMessage.style.display = "none";
+            emailCheckMessage.textContent = "❌ Invalid Email Address";
         } else if (emailPattern.test(email.value)) {
             email.classList.remove("error");
-            emailCheckMessage.style.display = "none";
+            emailCheckMessage.style.display = "block";
+            emailCheckMessage.textContent = "✔️ Valid Email Address";
         } else {
             email.classList.add("error");
             emailCheckMessage.style.display = "block";
+            emailCheckMessage.textContent = "❌ Invalid Email Address";
         }
         
         validateForm()
         
     });
 
-    password.addEventListener("input", function() {
-        const forbiddenPattern = /[\s\t\n\r\"']/;
-        let forbidden = false; 
-        const lowercasePattern = /[a-z]/;
-        let lowercase = true;
-        const uppercasePattern = /[A-Z]/;
-        let uppercase = true;
-        const numberPattern = /[0-9]/;
-        let number = true;
-        const specialPattern = /[!@#$%^&*()_\-+=\[\]{}|;:'\",.<>?/]/;
-        let special = true;
-        const minPasswordLength = 12;
-        let passLength = true;
+    username.addEventListener("input", function() {
+        const val = username.value;
 
-        if (password.value.length === 0) {
+         // ====== Patterns ======
+        const forbiddenPattern = /[\s\t\n\r\"']/;
+
+        if (val.length === 0 ) {
+            // usernameCheckMessage.style.display = "none";
+            // usernameCheckMessage.textContent = "❌ Invalid Username";
+            username.classList.remove("error");
+        } else if (forbiddenPattern.test(val)) {
+            // usernameCheckMessage.style.display = "block";
+            // .textContent = "❌ Invalid Username";
+            username.classList.add("error");
+        } else {
+            // usernameCheckMessage.style.display = "block";
+            // usernameCheckMessage.textContent = "✔️ Valid Username";
+            username.classList.remove("error");
+        }
+
+        validateForm();
+
+    });
+
+    password.addEventListener("input", function () {
+        const val = password.value;
+
+        // ====== Patterns ======
+        const forbiddenPattern = /[\s\t\n\r\"']/;
+        const uppercasePattern = /[A-Z]/;
+        const lowercasePattern = /[a-z]/;
+        const numberPattern = /[0-9]/;
+        const specialPattern = /[!@#$%^&*()_\-+=\[\]{}|;:'",.<>?/]/;
+        const minPasswordLength = 12;
+
+        // ====== Length check ======
+        if (val.length === 0) {
             passwordCheckLength.style.display = "none";
             passwordCheckLength.textContent = "❌ Password must be 12 characters minimum";
-            passLength = false;
-        } else if (password.value.length < minPasswordLength) {
+        } else if (val.length < minPasswordLength) {
             passwordCheckLength.style.display = "block";
             passwordCheckLength.textContent = "❌ Password must be 12 characters minimum";
-            passLength = false;
         } else {
             passwordCheckLength.style.display = "block";
             passwordCheckLength.textContent = "✔️ Password must be 12 characters minimum";
-            passLength = true;
         }
 
-        if (password.value.length === 0) {
+        // ====== Forbidden chars check ======
+        if (val.length === 0) {
             passwordCheckForbidden.style.display = "none";
-            passwordCheckForbidden.textContent = "❌  Password can't contain prohibited items";
-            forbidden = false;
-        } else if (forbiddenPattern.test(password.value)) {
+        } else if (forbiddenPattern.test(val)) {
             passwordCheckForbidden.style.display = "block";
-            passwordCheckForbidden.textContent = "❌  Password can't contain prohibited items";
-            forbidden = true;
+            passwordCheckForbidden.textContent = "❌ Password can't contain prohibited items";
         } else {
             passwordCheckForbidden.style.display = "block";
-            passwordCheckForbidden.textContent = "✔️  Password can't contain prohibited items";
-            forbidden = false;
+            passwordCheckForbidden.textContent = "✔️ Password can't contain prohibited items";
         }
 
-        if (password.value.length === 0) {
+        // ====== Uppercase ======
+        if (val.length === 0) {
             passwordCheckUppercase.style.display = "none";
-            passwordCheckUppercase.textContent = "❌ Password must contain an uppercase letter";
-            uppercase = false;
-        } else if (!uppercasePattern.test(password.value)) {
+        } else if (!uppercasePattern.test(val)) {
             passwordCheckUppercase.style.display = "block";
             passwordCheckUppercase.textContent = "❌ Password must contain an uppercase letter";
-            uppercase = true;
         } else {
             passwordCheckUppercase.style.display = "block";
             passwordCheckUppercase.textContent = "✔️ Password must contain an uppercase letter";
-            uppercase = false;
         }
 
-        if (password.value.length === 0) {
+        // ====== Lowercase ======
+        if (val.length === 0) {
             passwordCheckLowercase.style.display = "none";
-            passwordCheckLowercase.textContent = "❌ Password must contain an lowercase letter";
-            lowercase = false;
-        } else if (!lowercasePattern.test(password.value)) {
+        } else if (!lowercasePattern.test(val)) {
             passwordCheckLowercase.style.display = "block";
-            passwordCheckLowercase.textContent = "❌ Password must contain an lowercase letter";
-            lowercase = true;
+            passwordCheckLowercase.textContent = "❌ Password must contain a lowercase letter";
         } else {
             passwordCheckLowercase.style.display = "block";
-            passwordCheckLowercase.textContent = "✔️ Password must contain an lowercase letter";
-            lowercase = false;
+            passwordCheckLowercase.textContent = "✔️ Password must contain a lowercase letter";
         }
 
-        if (password.value.length === 0) {
+        // ====== Number ======
+        if (val.length === 0) {
             passwordCheckNumber.style.display = "none";
-            passwordCheckNumber.textContent = "❌ Password must contain a number";
-            number = false;
-        } else if (!numberPattern.test(password.value)) {
+        } else if (!numberPattern.test(val)) {
             passwordCheckNumber.style.display = "block";
             passwordCheckNumber.textContent = "❌ Password must contain a number";
-            number = true;
         } else {
             passwordCheckNumber.style.display = "block";
             passwordCheckNumber.textContent = "✔️ Password must contain a number";
-            number = false;
         }
 
-        if (password.value.length === 0) {
+        // ====== Special ======
+        if (val.length === 0) {
             passwordCheckSpecial.style.display = "none";
-            passwordCheckSpecial.textContent = "❌ Password must contain a special character";
-            special = false;
-        } else if (!specialPattern.test(password.value)) {
+        } else if (!specialPattern.test(val)) {
             passwordCheckSpecial.style.display = "block";
             passwordCheckSpecial.textContent = "❌ Password must contain a special character";
-            special = true;
         } else {
             passwordCheckSpecial.style.display = "block";
             passwordCheckSpecial.textContent = "✔️ Password must contain a special character";
-            special = false;
         }
 
-
-        if (password.value.length === 0) {
-            password.classList.remove("error");
-        }
-        else if (!passLength | forbidden | uppercase | lowercase | number | special) {
-            password.classList.add("error");
-        } else {
-            password.classList.remove("error");
-        }
-
+        // ====== Entropy calculation ======
         let characterPool = 0;
+        if (uppercasePattern.test(val)) characterPool += 26;
+        if (lowercasePattern.test(val)) characterPool += 26;
+        if (numberPattern.test(val)) characterPool += 10;
+        if (specialPattern.test(val)) characterPool += 33;
 
-        // Check for character types
-        const hasUppercase = /[A-Z]/.test(password.value);
-        const hasLowercase = /[a-z]/.test(password.value);
-        const hasNumber = /[0-9]/.test(password.value);
-        const hasSpecial = /[!@#$%^&*()_\-+=\[\]{}|;:'",.<>?/]/.test(password.value);
+        let entropy = val.length * Math.log2(characterPool || 1); // avoid log2(0)
+        let entropyPercentage = Math.min((entropy / 128) * 100, 100);
 
-        // Add to pool only once per type
-        if (hasUppercase) characterPool += 26;
-        if (hasLowercase) characterPool += 26;
-        if (hasNumber) characterPool += 10;
-        if (hasSpecial) characterPool += 33;
+        // ====== Show/hide entropy container ======
+        entropyContainer.style.display = val.length > 0 ? "block" : "none";
 
-        // Calculate entropy
-        const entropy = password.value.length * Math.log2(characterPool || 1); // avoid log2(0)
-        console.log(`Entropy: ${entropy.toFixed(2)} bits`);
+        // ====== Dictionary check ======
+        const match = containsDictionaryWord(val, words);
 
+        if (match) {
+            console.log(`❌ Failed: password contains dictionary word "${match}"`);
 
-        if (password.value.length > 0) {
-            entropyContainer.style.display = "block"
+            entropyBar.style.width = entropyPercentage + "%";
+            entropyBar.style.backgroundColor = getGradientColor(entropyPercentage);
+            passwordCheckWord.style.display = "block";
         } else {
-            entropyContainer.style.display = "none"
+            console.log("✅ Passed: no dictionary word found");
+
+            // Use entropy-based scale
+            entropyBar.style.width = entropyPercentage + "%";
+            entropyBar.style.backgroundColor = getGradientColor(entropyPercentage);
+            passwordCheckWord.style.display = "none";
+
+            if (entropy <= 28) {
+                entropyWords.textContent = "Very Weak";
+            } else if (entropy <= 36) {
+                entropyWords.textContent = "Weak";
+            } else if (entropy <= 60) {
+                entropyWords.textContent = "Normal";
+            } else if (entropy <= 80) {
+                entropyWords.textContent = "Strong";
+            } else {
+                entropyWords.textContent = "Very Strong";
+            }
         }
 
-        let entropyPercentage = entropy / 128 * 100
-        if (entropyPercentage > 100) {
-            entropyPercentage = 100
-        }
+        // ====== Repeating sequence check (3+ chars repeating at least once) ======
+        const repeatPattern = /(...).*?\1/; // any 3 characters repeated later
+        const singleRepeatPattern = /(.)\1{3,}/i; // same character repeated 5 or more times, case-insensitive
 
-        entropyBar.style.width = entropyPercentage + "%"
-        entropyBar.style.backgroundColor = getGradientColor(entropyPercentage)
-
-        if (entropy <= 28) {
-            entropyWords.textContent = "Very Weak"
-        } else if (entropy <= 36) {
-            entropyWords.textContent = "Weak"
-        } else if (entropy <= 60) {
-            entropyWords.textContent = "Normal"
-        } else if (entropy <= 80) {
-            entropyWords.textContent = "Strong"
+        if (repeatPattern.test(val)) {
+            passwordCheckRepeat.style.display = "block";
+            passwordCheckRepeat.textContent = "⚠️ Warning: password contains repeated sequences";
+        } else if (singleRepeatPattern.test(val)) {
+            passwordCheckRepeat.style.display = "block";
+            passwordCheckRepeat.textContent = "⚠️ Warning: password contains repeated characters";
         } else {
-            entropyWords.textContent = "Very Stong"
+            passwordCheckRepeat.style.display = "none";
         }
 
-        passwordMatch()
-        validateForm()
+        // ====== Sequential characters check (3+ increasing letters or numbers, at least twice) ======
+        if (hasSequential(val)) {
+            passwordCheckSequential.style.display = "block";
+        } else if (!repeatPattern.test(val)) {
+            // only hide if no repeats either
+            passwordCheckSequential.style.display = "none";
+        }
 
+        passwordMatch();
+        validateForm();
     });
+
 
     confirmPassword.addEventListener("input", function() {
 
@@ -467,12 +566,6 @@
     });
 
 
-    name.addEventListener("input", function() {
-        validateForm()
-    });
-    username.addEventListener("input", function() {
-        validateForm()
-    });
 
 
 
