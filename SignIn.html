@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sonnaz Group | Create Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    .login-container h2 {
+      margin-bottom: 0rem;
+      color: #333;
+    }
+
+    .login-container h3 {
+      margin-bottom: 1rem;
+      color: #666666;
+    }
+
+    .login-container input {
+      width: 275px;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .login-container button {
+      width: 200px;
+      padding: 10px;
+      margin: 20px 0;
+      background: #4CAF50;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .login-container button:hover {
+      background: #45a049;
+    }
+
+    .login-container a {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007BFF;
+      text-decoration: none;
+    }
+
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+
+    .padding {
+        padding: 10px;
+    }
+
+    .confirm-input {
+      border: 2px solid red;
+      background-color: #ffecec;
+    }
+
+    .message {
+        color: #f00;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .error {
+      border-color: red;
+      background-color: #ffecec;
+    }
+
+    .check {
+        display: none;
+        font-size: 12px;
+        text-align:  left;
+        margin: 0;
+        transition: 1s ease-in-out;
+    }
+
+    .entropy-container {
+        margin:  20px 5px;
+        align-items: start;
+        display: none;
+        text-align:  left;
+    }
+
+    .entropy-container p {
+        font-size:  12px;
+        margin: 8px 0;
+    }
+
+    .entropy {
+        background-color: #f00;
+        height: 8px;
+        width: 100%;
+        border-radius: 5px;
+    }
+
+    .name-container {
+        display: flex;
+        gap: 10px; /* space between inputs */
+        align-items: center;
+        justify-content: center;
+    }
+
+    .name-container input {
+        flex: 1; /* make both inputs equal width */
+        max-width: 41%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+
+
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Sonnaz Group</h2>
+    <div class="padding"></div>
+    <form action="javascript:void(0);" method="post" id="loginForm" >
+        <input type="text" id="emailInput" name="email" placeholder="Email" required>
+        <p class="check" id ="emailCheck">❌ Invalid Email Address</p>
+        <input type="password" id="passwordInput" name="password" placeholder="Password" required>
+        <p class="check" id ="passwordCheck">❌ Password must be 12 characters minimum</p>
+        <button type="submit">Login</button>
+    </form>
+    <a href="CreateAccount.html">Create Account</a>
+    <a href="ForgotPassword.html">Forgot Password?</a>
+  </div>
+
+  <script>
+
+    const email = document.getElementById("emailInput");
+    const emailMessage = document.getElementById("emailCheck");
+
+    const password = document.getElementById("passwordInput");
+    const passwordMessage = document.getElementById("passwordCheck");
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const usernameOrEmail = document.getElementById("emailInput").value;
+      const password = document.getElementById("passwordInput").value;
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username_or_email: usernameOrEmail, password })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 200) {
+            console.log("Login successful!");
+        } else if (response.status === 404) {
+            console.log("User does not exist");
+        } else if (response.status === 401) {
+            console.log("Email exists but password is incorrect");
+        } else {
+            console.log("Other error:", data.message);
+        }
+      } catch (err) {
+        console.error("Login request failed:", err);
+      }
+    });
+
+
+
+  </script>
+
+</body>
+</html>
