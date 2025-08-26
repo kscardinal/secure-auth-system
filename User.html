@@ -266,7 +266,7 @@
     const entropyWords = document.getElementById("entropy-words")
     const createButton = document.getElementById("create-Button")
 
-    function validateForm() {
+    async function validateForm() {
         const firstNameValue = firstName.value;
         const lastNameValue = lastName.value;
         const emailValue = email.value;
@@ -312,7 +312,9 @@
         const passwordsMatch = passwordValue === confirmPasswordValue;
 
         // Final result: all conditions met
-        const isValid = emailIsValid && passwordIsValid && passwordsMatch  && firstNameValid && lastNameValid && usernameValid;
+        console.log("Email: " + await checkAvailabilityBool("email", email.value))
+        console.log( "Username: " +  await checkAvailabilityBool("username", username.value))
+        const isValid = emailIsValid && passwordIsValid && passwordsMatch  && firstNameValid && lastNameValid && usernameValid && await checkAvailabilityBool("email", email.value) && await checkAvailabilityBool("username", username.value);
 
         if (isValid) {
             createButton.disabled = false;
@@ -345,9 +347,6 @@
             passwordCheckConfirm.textContent = "❌ Password must match";
             confirmPassword.classList.add("error");
         }
-
-        console.log(passwordValue)
-        console.log(confirmPasswordValue)
 
     }
 
@@ -520,8 +519,9 @@
             entropyBar.style.width = entropyPercentage + "%";
             entropyBar.style.backgroundColor = getGradientColor(entropyPercentage);
             passwordCheckWord.style.display = "none";
+        }
 
-            if (entropy <= 28) {
+        if (entropy <= 28) {
                 entropyWords.textContent = "Very Weak";
             } else if (entropy <= 36) {
                 entropyWords.textContent = "Weak";
@@ -532,7 +532,6 @@
             } else {
                 entropyWords.textContent = "Very Strong";
             }
-        }
 
         // ====== Repeating sequence check (3+ chars repeating at least once) ======
         const repeatPattern = /(...).*?\1/; // any 3 characters repeated later
@@ -627,6 +626,28 @@
                 }
             }
         }
+
+        async function checkAvailabilityBool(field, value) {
+            if (!value) return true;  // nothing entered → treat as "doesn't exist"
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/check-username-email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: field === "username" ? value : "",
+                        email: field === "email" ? value : ""
+                    })
+                });
+
+                const data = await response.json();
+                return data.exists === false;  // true if exists, false if not
+            } catch (err) {
+                console.error("Error checking availability:", err);
+                return true;  // treat errors as "doesn't exist" to avoid blocking
+            }
+        }
+
 
         // Add event listeners
         document.getElementById("username").addEventListener("blur", (e) => {
