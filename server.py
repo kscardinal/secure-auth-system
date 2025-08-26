@@ -1,30 +1,44 @@
+import sqlite3
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from argon2 import PasswordHasher
 
-app = Flask(__name__)
+DB_FILE = "users.db"
 
-# Allow your frontend specifically
+app = Flask(__name__)
 CORS(app, origins=["http://127.0.0.1:5500"])
 
-# Create Argon2 hasher
-ph = PasswordHasher(
-    time_cost=4,
-    memory_cost=102400,  # use 100 MB (not 1 GB so your PC doesn't freeze)
-    parallelism=8,
-    hash_len=32
-)
+ph = PasswordHasher(time_cost=4, memory_cost=102400, parallelism=8, hash_len=32)
 
-@app.route("/hash-password", methods=["POST"])
-def hash_password():
+def create_user(first_name, last_name, email, username, password_hash):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    now = datetime.utcnow().isoformat()
+
+    cursor.execute('''
+        INSERT INTO users (first_name, last_name, email, username, password, date_created)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (first_name, last_name, email, username, password_hash, now))
+
+    conn.commit()
+    conn.close()
+
+@app.route("/create-account", methods=["POST"])
+def create_account():
     data = request.get_json()
+    first_name = data.get("first_name", "")
+    last_name = data.get("last_name", "")
+    email = data.get("email", "")
+    username = data.get("username", "")
     password = data.get("password", "")
 
-    print("DEBUG received data:", data)
-    print("DEBUG extracted password:", password, type(password))
-    
-    hash_value = ph.hash(password)
-    return jsonify({"hashed_password": hash_value})
+    try:
+        password_hash = ph.hash(password)
+        create_user(first_name, last_name, email, username, password_hash)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(port=5000, debug=True)

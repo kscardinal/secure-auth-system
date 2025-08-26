@@ -571,14 +571,19 @@
         e.preventDefault();
         console.log("Form submitted");   // ✅ debug log
 
-        const password = passwordInput.value;  // <-- get the actual string
         console.log("Password entered:", password);  // ✅ debug log
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/hash-password", {
+            const response = await fetch("http://127.0.0.1:5000/create-account", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password: password })
+            body: JSON.stringify({
+                first_name: firstNameInput.value,
+                last_name: lastNameInput.value,
+                email: emailInput.value,
+                username: username.value,
+                password: passwordInput.value
+                })
             });
 
             const data = await response.json();
