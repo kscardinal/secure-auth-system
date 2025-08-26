@@ -566,11 +566,6 @@
 
     });
 
-        form.addEventListener("submit", function(event) {
-
-        alert("Account created successfully!"); 
-
-        });
 
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -589,7 +584,7 @@
             const data = await response.json();
             console.log("Response from server:", data);
 
-            alert("Password hashed: " + data.hashed_password);
+            // alert("Password hashed: " + data.hashed_password);
         } catch (err) {
             console.error("Error:", err);
             alert("Request failed — check console for details.");
