@@ -33,12 +33,50 @@ def create_account():
     username = data.get("username", "")
     password = data.get("password", "")
 
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+
+    # Check if username or email already exist
+    cursor.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
+    existing = cursor.fetchone()
+    if existing:
+        conn.close()
+        return jsonify({"status": "error", "message": "Username or email already exists"}), 400
+
     try:
         password_hash = ph.hash(password)
-        create_user(first_name, last_name, email, username, password_hash)
+        now = datetime.utcnow().isoformat()
+        cursor.execute('''
+            INSERT INTO users (first_name, last_name, email, username, password, date_created)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (first_name, last_name, email, username, password_hash, now))
+
+        conn.commit()
+        conn.close()
         return jsonify({"status": "success"})
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 400
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route("/check-username-email", methods=["POST"])
+def check_username_email():
+    data = request.get_json()
+    username = data.get("username", "")
+    email = data.get("email", "")
+
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)", (username, email))
+    existing = cursor.fetchone()
+    conn.close()
+
+    if existing:
+        return jsonify({"exists": True})
+    else:
+        return jsonify({"exists": False})
+
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

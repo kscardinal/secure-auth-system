@@ -395,21 +395,20 @@
         const forbiddenPattern = /[\s\t\n\r\"']/;
 
         if (val.length === 0 ) {
-            usernameCheckMessage.style.display = "none";
-            usernameCheckMessage.textContent = "❌ Invalid Username";
+            // usernameCheckMessage.style.display = "none";
+            // usernameCheckMessage.textContent = "❌ Invalid Username";
             username.classList.remove("error");
         } else if (forbiddenPattern.test(val)) {
-            usernameCheckMessage.style.display = "block";
-            usernameCheckMessage.textContent = "❌ Invalid Username";
+            // usernameCheckMessage.style.display = "block";
+            // .textContent = "❌ Invalid Username";
             username.classList.add("error");
         } else {
-            usernameCheckMessage.style.display = "block";
-            usernameCheckMessage.textContent = "✔️ Valid Username";
+            // usernameCheckMessage.style.display = "block";
+            // usernameCheckMessage.textContent = "✔️ Valid Username";
             username.classList.remove("error");
         }
 
         validateForm();
-        checkAvailability("username", username.value, "usernameCheck")
 
     });
 
@@ -619,7 +618,7 @@
 
             const errorSpan = document.getElementById(errorSpanId);
             if (data.exists) {
-                errorSpan.textContent = "❌ " +  field.charAt(0).toUpperCase() + field.slice(1) + " already exists";
+                errorSpan.textContent = "❌ " +  field + " already exists";
                 if (field === "username") {
                     username.classList.add("error");
                 } else if (field === "email"){
@@ -630,11 +629,11 @@
 
         // Add event listeners
         document.getElementById("username").addEventListener("blur", (e) => {
-            checkAvailability("username", e.target.value, "usernameCheck");
+            checkAvailability("username", e.target.value, "usernameError");
         });
 
         document.getElementById("emailInput").addEventListener("blur", (e) => {
-            checkAvailability("email", e.target.value, "emailCheck");
+            checkAvailability("email", e.target.value, "emailError");
         });
 
 
