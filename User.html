@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
+  <title>Sonnaz Group | Create Account</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -131,6 +131,7 @@
         display: flex;
         gap: 10px; /* space between inputs */
         align-items: center;
+        justify-content: center;
     }
 
     .name-container input {
@@ -141,6 +142,11 @@
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 14px;
+    }
+
+    .form-check {
+        display: flex;
+        justify-content: start;
     }
 
 
@@ -159,6 +165,10 @@
         </div>
         <input type="text" id="emailInput" name="email" placeholder="Email" required>
         <p class="check" id ="emailCheck">❌ Invalid Email Address</p>
+        <div class="form-check">
+            <input type="checkbox" id="notifications" name="notifications">
+            <label for="notifications">I would like to receive notifications about updates</label>
+        </div>
         <div class="padding"></div>
         <input type="text" id="username" name="username" placeholder="Username" required>
         <p class="check" id ="usernameCheck">❌ Invalid Username</p>
@@ -565,6 +575,11 @@
 
     });
 
+        form.addEventListener("submit", function(event) {
+
+        alert("Account created successfully!"); 
+
+        });
 
 
 
