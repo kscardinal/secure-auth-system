@@ -144,11 +144,6 @@
         font-size: 14px;
     }
 
-    .form-check {
-        display: flex;
-        justify-content: start;
-    }
-
 
 
   </style>
@@ -158,17 +153,13 @@
   <div class="login-container">
     <h2>Sonnaz Group</h2>
     <h3>Create an account</h3>
-    <form action="#" method="post" id="signupForm">
+    <form action="javascript:void(0);" method="post" id="signupForm" >
         <div class="name-container">
             <input type="text" id="firstNameInput" name="firstName" placeholder="First Name" required>
             <input type="text" id="lastNameInput" name="lastName" placeholder="Last Name" required>
         </div>
         <input type="text" id="emailInput" name="email" placeholder="Email" required>
         <p class="check" id ="emailCheck">❌ Invalid Email Address</p>
-        <div class="form-check">
-            <input type="checkbox" id="notifications" name="notifications">
-            <label for="notifications">I would like to receive notifications about updates</label>
-        </div>
         <div class="padding"></div>
         <input type="text" id="username" name="username" placeholder="Username" required>
         <p class="check" id ="usernameCheck">❌ Invalid Username</p>
@@ -581,6 +572,29 @@
 
         });
 
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        console.log("Form submitted");   // ✅ debug log
+
+        const password = passwordInput.value;  // <-- get the actual string
+        console.log("Password entered:", password);  // ✅ debug log
+
+        try {
+            const response = await fetch("http://127.0.0.1:5000/hash-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: password })
+            });
+
+            const data = await response.json();
+            console.log("Response from server:", data);
+
+            alert("Password hashed: " + data.hashed_password);
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Request failed — check console for details.");
+        }
+        });
 
 
 
