@@ -200,5 +200,24 @@ def verify_backup_code():
     else:
         return jsonify({"success": False})
 
+@app.route("/update-password", methods=["POST"])
+def update_password():
+    data = request.get_json()
+    email = data.get("email")
+    new_password = data.get("new_password")
+
+    if not email or not new_password:
+        return jsonify({"success": False, "message": "Email and password required"}), 400
+
+    # Hash the new password
+    hashed_pw = ph.hash(new_password)
+
+    conn = get_db_connection()
+    conn.execute("UPDATE users SET password = ? WHERE email = ?", (hashed_pw, email))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True})
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
