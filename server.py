@@ -230,5 +230,41 @@ def update_password():
 
     return jsonify({"success": True})
 
+@app.route("/update-login-attempts", methods=["POST"])
+def update_login_attempts():
+    data = request.get_json()
+    email = data.get("email")
+    attempts = data.get("login_attempts", 0)
+
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users SET login_attempts = ? WHERE LOWER(email) = LOWER(?)",
+        (attempts, email)
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True, "message": f"login_attempts updated to {attempts}"})
+
+
+@app.route("/update-verification-attempts", methods=["POST"])
+def update_verification_attempts():
+    data = request.get_json()
+    email = data.get("email")
+    attempts = data.get("verification_attempts", 0)
+
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users SET verification_attempts = ? WHERE LOWER(email) = LOWER(?)",
+        (attempts, email)
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True, "message": f"verification_attempts updated to {attempts}"})
+
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
