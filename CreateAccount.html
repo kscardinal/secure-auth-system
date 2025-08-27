@@ -387,6 +387,7 @@
             email.classList.remove("error");
             emailCheckMessage.style.display = "block";
             emailCheckMessage.textContent = "✔️ Valid Email Address";
+            checkAvailability("email", email.value, "emailCheck")
         } else {
             email.classList.add("error");
             emailCheckMessage.style.display = "block";
@@ -394,7 +395,7 @@
         }
         
         validateForm()
-        checkAvailability("email", email.value, "emailCheck")
+        
         
     });
 
