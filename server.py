@@ -177,5 +177,28 @@ def send_backup_code():
         print("Error sending email:", e)
         return jsonify({"success": False, "message": "Failed to send email"}), 500
 
+def get_db_connection():
+    conn = sqlite3.connect("users.db")
+    conn.row_factory = sqlite3.Row  # <-- enables dict-style access
+    return conn
+
+
+@app.route("/verify-backup-code", methods=["POST"])
+def verify_backup_code():
+    data = request.json
+    email = data.get("email")
+    backup_code = data.get("backup_code")
+
+    conn = get_db_connection()
+    user = conn.execute(
+        "SELECT backup_code FROM users WHERE LOWER(email) = LOWER(?)", (email,)
+    ).fetchone()
+    conn.close()
+
+    if user and user["backup_code"] == backup_code:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
