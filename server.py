@@ -5,6 +5,17 @@ from flask_cors import CORS
 from argon2 import PasswordHasher
 from argon2 import exceptions
 import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+
+sender_email = os.getenv("SENDER_EMAIL")
+sender_password = os.getenv("SENDER_PASSWORD")
 
 DB_FILE = "users.db"
 
@@ -122,6 +133,49 @@ def login():
         conn.close()
         return jsonify({"status": "error", "message": "Email exists but password is incorrect"}), 401
 
+
+def send_email(to_email, subject, body):
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "plain"))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+
+def get_backup_code(email):
+    """Fetch backup code for a given email from the DB"""
+    conn = sqlite3.connect("users.db")  # change to your DB
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT backup_code FROM users WHERE LOWER(email) = LOWER(?)", (email,))
+    row = cursor.fetchone()
+
+    conn.close()
+    return row[0] if row else None
+
+@app.route("/send-backup-code", methods=["POST"])
+def send_backup_code():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"success": False, "message": "No email provided"}), 400
+
+    # Get backup code from DB
+    backup_code = get_backup_code(email)
+
+    if not backup_code:
+        return jsonify({"success": False, "message": "Email not found"}), 404
+
+    try:
+        send_email(email, "Your Backup Code", f"Here is your backup code: {backup_code}")
+        return jsonify({"success": True, "message": "Backup code sent successfully"})
+    except Exception as e:
+        print("Error sending email:", e)
+        return jsonify({"success": False, "message": "Failed to send email"}), 500
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
