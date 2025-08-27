@@ -126,8 +126,6 @@ def login():
         now = datetime.utcnow().isoformat()
         cursor.execute("UPDATE users SET last_accessed = ? WHERE id = ?", (now, user_id))
         conn.commit()
-        cursor.execute("UPDATE users SET login_attempts = 1 WHERE id = ?",  (user_id,))
-        conn.commit()
         conn.close()
         return jsonify({"status": "success", "message": "Logged in successfully"})
 
