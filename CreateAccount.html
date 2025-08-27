@@ -312,8 +312,6 @@
         const passwordsMatch = passwordValue === confirmPasswordValue;
 
         // Final result: all conditions met
-        console.log("Email: " + await checkAvailabilityBool("email", email.value))
-        console.log( "Username: " +  await checkAvailabilityBool("username", username.value))
         const isValid = emailIsValid && passwordIsValid && passwordsMatch  && firstNameValid && lastNameValid && usernameValid && await checkAvailabilityBool("email", email.value) && await checkAvailabilityBool("username", username.value);
 
         if (isValid) {

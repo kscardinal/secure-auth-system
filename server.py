@@ -126,6 +126,8 @@ def login():
         now = datetime.utcnow().isoformat()
         cursor.execute("UPDATE users SET last_accessed = ? WHERE id = ?", (now, user_id))
         conn.commit()
+        cursor.execute("UPDATE users SET login_attempts = 1 WHERE id = ?",  (user_id,))
+        conn.commit()
         conn.close()
         return jsonify({"status": "success", "message": "Logged in successfully"})
 
@@ -211,9 +213,20 @@ def update_password():
 
     # Hash the new password
     hashed_pw = ph.hash(new_password)
+    now = datetime.utcnow().isoformat()
 
-    conn = get_db_connection()
-    conn.execute("UPDATE users SET password = ? WHERE email = ?", (hashed_pw, email))
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE users
+        SET password = ?, latest_reset = ?, password_resets = password_resets + 1
+        WHERE LOWER(email) = LOWER(?)
+        """,
+        (hashed_pw, now, email)
+    )
+
     conn.commit()
     conn.close()
 
