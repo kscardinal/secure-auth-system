@@ -132,10 +132,10 @@
 
             document.getElementById("email").textContent = data.email;
             document.getElementById("username").textContent = data.username;
-            document.getElementById("dateCreated").textContent = formatDate(data.date_created, -5);
-            document.getElementById("lastAccessed").textContent = formatDate(data.last_accessed, -5) || "Never";
+            document.getElementById("dateCreated").textContent = formatDate(data.date_created, -4);
+            document.getElementById("lastAccessed").textContent = formatDate(data.last_accessed, -4) || "Never";
             document.getElementById("loginAttempts").textContent = data.login_attempts;
-            document.getElementById("latestReset").textContent = formatDate(data.latest_reset, -5);
+            document.getElementById("latestReset").textContent = formatDate(data.latest_reset, -4);
             document.getElementById("passwordResets").textContent = data.password_resets;
             document.getElementById("VerificationAttempts").textContent = data.verification_attempts;
 
