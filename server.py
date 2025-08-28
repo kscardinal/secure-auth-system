@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 from flask import Flask, request, jsonify
+from flask import Flask, session
 from flask_cors import CORS
 from argon2 import PasswordHasher
 from argon2 import exceptions
@@ -20,7 +21,8 @@ sender_password = os.getenv("SENDER_PASSWORD")
 DB_FILE = "users.db"
 
 app = Flask(__name__)
-CORS(app, origins=["http://127.0.0.1:5500"])
+CORS(app, origins=["http://127.0.0.1:5500"], supports_credentials=True)
+app.secret_key = "supersecretkey"  # Use a secure random string in real apps!
 
 ph = PasswordHasher(time_cost=4, memory_cost=102400, parallelism=8, hash_len=32)
 
@@ -122,6 +124,10 @@ def login():
 
     try:
         ph.verify(stored_hash, password)
+
+        session["user_id"] = user_id
+        print(f'user_id: {user_id} added to session')  
+
         # Password correct → update last_accessed
         now = datetime.utcnow().isoformat()
         cursor.execute("UPDATE users SET last_accessed = ? WHERE id = ?", (now, user_id))
@@ -265,6 +271,31 @@ def update_verification_attempts():
     conn.close()
 
     return jsonify({"success": True, "message": f"verification_attempts updated to {attempts}"})
+
+@app.route("/user-details", methods=["GET"])
+def user_details():
+    if "user_id" not in session:
+        return jsonify({"status": "error", "message": "Not logged in"}), 401
+
+    user_id = session["user_id"]
+
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username, email, date_created, last_accessed FROM users WHERE id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        username, email, date_created, last_accessed = row
+        return jsonify({
+            "status": "success",
+            "username": username,
+            "email": email,
+            "date_created": date_created,
+            "last_accessed": last_accessed
+        })
+    else:
+        return jsonify({"status": "error", "message": "User not found"}), 404
 
 
 if __name__ == "__main__":
