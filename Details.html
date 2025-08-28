@@ -78,11 +78,11 @@
         <div id="divider"></div>
         <p style="font-weight: bold;">Latest Password Reset: <span style="font-weight: normal;" id="latestReset"></span></p>
         <p style="font-weight: bold;">Password Resets: <span style="font-weight: normal;" id="passwordResets"></span></p>
-        <p style="font-weight: bold;">Verification Attempts: <span style="font-weight: normal;" id="VerificationAttempts"></span></p>
+        <p style="font-weight: bold;">Verification Attempts: <span style="font-weight: normal;" id="verificationAttempts"></span></p>
     </div>        
     <div id="marginTop">
         <a href="SignIn.html">Login</a>
-        <a href="ForgotPassword.html">Forgot Password?</a>
+        <a href="ForgotPassword.html">Reset Password</a>
     </div>
   </div>
 
@@ -137,7 +137,7 @@
             document.getElementById("loginAttempts").textContent = data.login_attempts;
             document.getElementById("latestReset").textContent = formatDate(data.latest_reset, -4);
             document.getElementById("passwordResets").textContent = data.password_resets;
-            document.getElementById("VerificationAttempts").textContent = data.verification_attempts;
+            document.getElementById("verificationAttempts").textContent = data.verification_attempts;
 
         } catch (err) {
             alert("Error loading user details: " + err.message);
