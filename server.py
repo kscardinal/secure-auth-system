@@ -281,18 +281,22 @@ def user_details():
 
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT username, email, date_created, last_accessed FROM users WHERE id = ?", (user_id,))
+    cursor.execute("SELECT username, email, date_created, last_accessed, login_attempts, latest_reset, password_resets, verification_attempts FROM users WHERE id = ?", (user_id,))
     row = cursor.fetchone()
     conn.close()
 
     if row:
-        username, email, date_created, last_accessed = row
+        username, email, date_created, last_accessed, login_attempts, latest_reset,  password_resets, verification_attempts = row
         return jsonify({
             "status": "success",
             "username": username,
             "email": email,
             "date_created": date_created,
-            "last_accessed": last_accessed
+            "last_accessed": last_accessed,
+            "login_attempts": login_attempts,
+            "latest_reset": latest_reset,
+            "password_resets": password_resets,
+            "verification_attempts": verification_attempts
         })
     else:
         return jsonify({"status": "error", "message": "User not found"}), 404

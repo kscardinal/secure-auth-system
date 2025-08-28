@@ -4,22 +4,118 @@
   <meta charset="UTF-8">
   <title>Sonnaz Group | User Details</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; justify-content: center; align-items: center;}
-    .card { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 300px; }
-    .card h2 { margin-top: 0; }
-    .info { margin-bottom: 10px; }
-    .label { font-weight: bold; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 500px;
+      text-align: center;
+    }
+
+    .login-container h2 {
+      margin-bottom: 0rem;
+      color: #333;
+    }
+
+    .login-container h3 {
+      margin-bottom: 0rem;
+      color: #666666;
+    }
+
+    .login-container a {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007BFF;
+      text-decoration: none;
+    }
+
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+
+    #marginTop {
+        margin-top: 2rem;
+    }
+
+    .login-container p {
+        font-size: 16px;
+        text-align:  left;
+    }
+
+    #divider {
+        padding: 3px 0;
+    }
+
+
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Your Account</h2>
-    <div class="info"><span class="label">Email:</span> <span id="email"></span></div>
-    <div class="info"><span class="label">Date Created:</span> <span id="dateCreated"></span></div>
-    <div class="info"><span class="label">Last Accessed:</span> <span id="lastAccessed"></span></div>
+  <div class="login-container">
+    <h2>Sonnaz Group</h2>
+    <h3>Account Details</h3>
+    <div class="padding"></div>
+    <div id="marginTop">
+        <p style="font-weight: bold;">Email: <span style="font-weight: normal;" id="email"></span></p>
+        <p style="font-weight: bold;">Username: <span style="font-weight: normal;" id="username"></span></p>
+        <div id="divider"></div>
+        <p style="font-weight: bold;">Date Created: <span style="font-weight: normal;" id="dateCreated"></span></p>
+        <div id="divider"></div>
+        <p style="font-weight: bold;">Last Accessed: <span style="font-weight: normal;" id="lastAccessed"></span></p>
+        <p style="font-weight: bold;">Login Attempts: <span style="font-weight: normal;" id="loginAttempts"></span></p>
+        <div id="divider"></div>
+        <p style="font-weight: bold;">Latest Password Reset: <span style="font-weight: normal;" id="latestReset"></span></p>
+        <p style="font-weight: bold;">Password Resets: <span style="font-weight: normal;" id="passwordResets"></span></p>
+        <p style="font-weight: bold;">Verification Attempts: <span style="font-weight: normal;" id="VerificationAttempts"></span></p>
+    </div>        
+    <div id="marginTop">
+        <a href="SignIn.html">Login</a>
+        <a href="ForgotPassword.html">Forgot Password?</a>
+    </div>
   </div>
 
   <script>
+
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+
+        const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+        const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+        const dayName = days[date.getDay()];
+        const monthName = months[date.getMonth()];
+        const day = date.getDate();
+
+        // Add suffix: st, nd, rd, th
+        const daySuffix = (d) => {
+            if (d > 3 && d < 21) return 'th';
+            switch (d % 10) {
+                case 1: return "st";
+                case 2: return "nd";
+                case 3: return "rd";
+                default: return "th";
+            }
+        };
+
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${dayName}, ${monthName} ${day}${daySuffix(day)} ${hours}:${minutes}:${seconds}`;
+    }
+
     async function loadUserDetails() {
         try {
             const response = await fetch("http://127.0.0.1:5000/user-details", {
@@ -32,8 +128,14 @@
             const data = await response.json();
 
             document.getElementById("email").textContent = data.email;
-            document.getElementById("dateCreated").textContent = data.date_created;
-            document.getElementById("lastAccessed").textContent = data.last_accessed || "Never";
+            document.getElementById("username").textContent = data.username;
+            document.getElementById("dateCreated").textContent = formatDate(data.date_created);
+            document.getElementById("lastAccessed").textContent = formatDate(data.last_accessed) || "Never";
+            document.getElementById("loginAttempts").textContent = data.login_attempts;
+            document.getElementById("latestReset").textContent = formatDate(data.latest_reset);
+            document.getElementById("passwordResets").textContent = data.password_resets;
+            document.getElementById("VerificationAttempts").textContent = data.verification_attempts;
+
         } catch (err) {
             alert("Error loading user details: " + err.message);
         }
