@@ -88,8 +88,11 @@
 
   <script>
 
-    function formatDate(isoString) {
+    function formatDate(isoString, timezoneOffset = 0) {
         const date = new Date(isoString);
+
+        // Apply timezone offset in hours
+        date.setHours(date.getHours() + timezoneOffset);
 
         const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
         const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -114,7 +117,7 @@
         const seconds = String(date.getSeconds()).padStart(2, '0');
 
         return `${dayName}, ${monthName} ${day}${daySuffix(day)} ${hours}:${minutes}:${seconds}`;
-    }
+}
 
     async function loadUserDetails() {
         try {
@@ -129,10 +132,10 @@
 
             document.getElementById("email").textContent = data.email;
             document.getElementById("username").textContent = data.username;
-            document.getElementById("dateCreated").textContent = formatDate(data.date_created);
-            document.getElementById("lastAccessed").textContent = formatDate(data.last_accessed) || "Never";
+            document.getElementById("dateCreated").textContent = formatDate(data.date_created, -5);
+            document.getElementById("lastAccessed").textContent = formatDate(data.last_accessed, -5) || "Never";
             document.getElementById("loginAttempts").textContent = data.login_attempts;
-            document.getElementById("latestReset").textContent = formatDate(data.latest_reset);
+            document.getElementById("latestReset").textContent = formatDate(data.latest_reset, -5);
             document.getElementById("passwordResets").textContent = data.password_resets;
             document.getElementById("VerificationAttempts").textContent = data.verification_attempts;
 

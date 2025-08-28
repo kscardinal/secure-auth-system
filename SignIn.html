@@ -187,18 +187,19 @@
             emailMessage.style.display = "none";
             passwordMessage.style.display = "none";
 
-            // Send the current frontend login_attempts value to the server to update DB
-            fetch("http://127.0.0.1:5000/update-login-attempts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    email: usernameOrEmail, 
-                    login_attempts: login_attempts 
-                })
-            })
-            .then(res => res.json())
-            .then(data => console.log(data.message))
-            .catch(err => console.error("Failed to update login_attempts:", err));
+            try {
+              const updateResp = await fetch("http://127.0.0.1:5000/update-login-attempts", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({ email: usernameOrEmail, login_attempts: login_attempts })
+              });
+
+              const updateData = await updateResp.json();
+              console.log(updateData.message);
+          } catch (err) {
+              console.error("Failed to update login_attempts:", err);
+          }
 
             console.log("Redirecting…");
             window.location.href = "Details.html";
@@ -214,6 +215,7 @@
             passwordMessage.textContent = "❌ Wrong Password"
             passwordMessage.style.display = "block";
             login_attempts = login_attempts + 1;
+            console.log(login_attempts)
         } else {
             console.log("Other error:", data.message);
             emailMessage.style.display = "none";

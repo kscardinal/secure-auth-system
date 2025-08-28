@@ -22,7 +22,7 @@ DB_FILE = "users.db"
 
 app = Flask(__name__)
 CORS(app, origins=["http://127.0.0.1:5500"], supports_credentials=True)
-app.secret_key = "supersecretkey"  # Use a secure random string in real apps!
+app.secret_key = "supersecretkey" 
 
 ph = PasswordHasher(time_cost=4, memory_cost=102400, parallelism=8, hash_len=32)
 
@@ -126,7 +126,6 @@ def login():
         ph.verify(stored_hash, password)
 
         session["user_id"] = user_id
-        print(f'user_id: {user_id} added to session')  
 
         # Password correct → update last_accessed
         now = datetime.utcnow().isoformat()
@@ -252,7 +251,9 @@ def update_login_attempts():
     conn.commit()
     conn.close()
 
-    return jsonify({"success": True, "message": f"login_attempts updated to {attempts}"})
+    return jsonify({"success": True, "message": f"Login attempts updated to {attempts}"})
+
+
 
 
 @app.route("/update-verification-attempts", methods=["POST"])
