@@ -26,7 +26,7 @@ ph = PasswordHasher(time_cost=4, memory_cost=102400, parallelism=8, hash_len=32)
 
 def generate_backup_code():
     # Generates a 10-digit numeric string
-    return ''.join([str(secrets.randbelow(10)) for _ in range(10)])
+    return ''.join([str(secrets.randbelow(6)) for _ in range(6)])
 
 
 def create_user(first_name, last_name, email, username, password_hash):
@@ -212,6 +212,7 @@ def update_password():
     # Hash the new password
     hashed_pw = ph.hash(new_password)
     now = datetime.utcnow().isoformat()
+    new_backup_code = generate_backup_code()
 
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
@@ -219,10 +220,10 @@ def update_password():
     cursor.execute(
         """
         UPDATE users
-        SET password = ?, latest_reset = ?, password_resets = password_resets + 1
+        SET password = ?, latest_reset = ?, password_resets = password_resets + 1, backup_code = ?
         WHERE LOWER(email) = LOWER(?)
         """,
-        (hashed_pw, now, email)
+        (hashed_pw, now, new_backup_code, email)
     )
 
     conn.commit()
