@@ -1,11 +1,14 @@
 import sqlite3
 
+# Define the database file
 DB_FILE = "users.db"
 
+# Initialize the DB
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
+    # Create the table in the DB
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +20,12 @@ def init_db():
         date_created TEXT NOT NULL,
         last_accessed TEXT,
         is_active INTEGER DEFAULT 1,
-        role TEXT DEFAULT 'user'
+        role TEXT DEFAULT 'user',
+        backup_code TEXT,
+        login_attempts INTEGER DEFAULT 0,
+        latest_reset TEXT,
+        password_resets INTEGER DEFAULT 0,
+        verification_attempts INTEGER DEFAULT 0
     )
     ''')
 
@@ -25,5 +33,7 @@ def init_db():
     conn.close()
     print("Database initialized.")
     
+
+# Run the main program
 if __name__ == "__main__":
     init_db()

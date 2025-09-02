@@ -25,4 +25,4 @@ def send_email(to_email, subject, body):
         server.send_message(msg)
 
 # Example usage
-send_email("kyle@schang.net", "Your Backup Code", "Here is your backup code: 1234567890")
+send_email("sample@email.com", "Your Backup Code", "Here is your backup code: 1234567890")
