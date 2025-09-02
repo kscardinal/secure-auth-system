@@ -52,13 +52,13 @@ python server.py
 ---
 
 ### Project Structure
-[server.py](server.py) - Main Flask application with API endpoints
-[database.py](database.py) - Database initialization and schema
-[Login.html](Login.html) - Login page
-[CreateAccount.html](CreateAccount.html) - Account creation page
-[ForgotPassword.html](ForgotPassword.html) - Password reset page
-[Details.html](Details.html) - User account details page
-style_*.css - CSS stylesheets
+- [server.py](server.py) - Main Flask application with API endpoints
+- [database.py](database.py) - Database initialization and schema
+- [Login.html](Login.html) - Login page
+- [CreateAccount.html](CreateAccount.html) - Account creation page
+- [ForgotPassword.html](ForgotPassword.html) - Password reset page
+- [Details.html](Details.html) - User account details page
+- style_*.css - CSS stylesheets
 
 ---
 
