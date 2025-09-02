@@ -52,13 +52,13 @@ python server.py
 ---
 
 ### Project Structure
-- [server.py](server.py) - Main Flask application with API endpoints
-- [database.py](database.py) - Database initialization and schema
-- [Login.html](Login.html) - Login page
-- [CreateAccount.html](CreateAccount.html) - Account creation page
-- [ForgotPassword.html](ForgotPassword.html) - Password reset page
-- [Details.html](Details.html) - User account details page
-- style_*.css - CSS stylesheets
+- [`server.py`](server.py) - Main Flask application with API endpoints
+- [`database.py`](database.py) - Database initialization and schema
+- [`Login.html`](Login.html) - Login page
+- [`CreateAccount.html`](CreateAccount.html) - Account creation page
+- [`ForgotPassword.html`](ForgotPassword.html) - Password reset page
+- [`Details.html`](Details.html) - User account details page
+- `style_*.css` - CSS stylesheets
 
 ---
 
@@ -74,14 +74,14 @@ python server.py
 ---
 
 ### API Endpoints
-| Endpoint            | Method | Description                  |
-| ------------------- | ------ | ---------------------------- |
-| /create-account     | POST   | Create new user account      |
-| /login              | POST   | User authentication          |
-| /send-backup-code   | POST   | Send recovery code via email |
-| /verify-backup-code | POST   | Verify recovery code         |
-| /update-password    | POST   | Change user password         |
-| /user-details       | GET    | Get user account information |
+| Endpoint              | Method | Description                  |
+| --------------------- | ------ | ---------------------------- |
+| `/create-account`     | POST   | Create new user account      |
+| `/login`              | POST   | User authentication          |
+| `/send-backup-code`   | POST   | Send recovery code via email |
+| `/verify-backup-code` | POST   | Verify recovery code         |
+| `/update-password`    | POST   | Change user password         |
+| `/user-details`       | GET    | Get user account information |
 
 ---
 
