@@ -2,7 +2,10 @@
 `secure-auth-system` is a secure authentication system with account management features built with Flask and SQLite.
 
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)  ![Version](https://img.shields.io/badge/Version-1.0.0-green)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/Version-1.0.0-green)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/t/kscardinal/secure-auth-system)
+![GitHub last commit](https://img.shields.io/github/last-commit/kscardinal/secure-auth-system)
 
 ---
 
