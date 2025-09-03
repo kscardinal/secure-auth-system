@@ -1,34 +1,72 @@
-## LOTO Testing Project
-A secure authentication system with account management features built with Flask and SQLite.
+# 📌 secure-auth-system 
+`secure-auth-system` is a secure authentication system with account management features built with Flask and SQLite.
+
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)  ![Version](https://img.shields.io/badge/Version-1.0.0-green)
 
 ---
 
-### Features
+## Table of Contents  
+- [Overview](#Overview)
+- [Features](#features)
+- [Tech Stack](#Tech-Stack)
+- [Project Structure](#project-structure)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Security Features](#security-features)
+- [API Endpoints](#API-Endpoints)
+- [License](#License)
+
+---
+
+## Overview  
+
+`secure-auth-system` is a secure authentication system built with Flask, designed to manage user accounts and provide robust password handling and recovery features. It uses Argon2 for password hashing, stores user data in a SQLite database, and supports account creation, login, password resets, and backup code verification. The system integrates email functionality for sending backup codes and password reset notifications, and tracks user activity such as login attempts and password resets. Environment variables are used for sensitive email credentials, and CORS is configured to allow secure cross-origin requests from a specified frontend. Overall, the project aims to provide a secure, user-friendly authentication backend for web applications.  
+
+---
+
+## Features  
+
 - Secure user authentication with Argon2 password hashing
 - Account creation with email verification
 - Password reset functionality with backup codes
 - Brute force protection with login attempt tracking
 - Password strength requirements:
-  - Minimum 12 characters
-  - Must contain uppercase and lowercase letters
-  - Must contain numbers and special characters
-  - Dictionary word checks
-  - Sequential character checks
+	- Minimum 12 characters
+	- Must contain uppercase and lowercase letters
+	- Must contain numbers and special characters
+	- Dictionary word checks
+	- Sequential character checks
 - User activity tracking (login attempts, password resets, etc.)
-- Responsive web interface
+- Responsive web interface.
 
 ---
 
-### Tech Stack
-- Backend: Python/Flask
-- Database: SQLite
-- Frontend: HTML/CSS/JavaScript
-- Password Hashing: Argon2
-- Email: SMTP (Gmail)
+## Tech Stack  
+
+- **Frontend**: HTML, CSS, JavaScript 
+- **Backend**: Python, Flask
+- **Database**: SQLite
+- **Other Tools**: Argon2  
 
 ---
 
-### Setup
+## Project Structure  
+
+- secure-auth-system/
+- ├── [`server.py`](server.py)                           # Main Flask application with API endpoints
+- ├── [`databse.py`](database.py)                         # Database initialization and schema
+- ├── [`Login.html`](Login.html)                         # Login page
+- ├── [`CreateAccount.html`](CreateAccount.html)          # Account creation page
+- ├── [`ForgotPassword.html`](ForgotPassword.html)        # Password reset page
+- ├── [`Details.html`](Details.html)                     # User account details page
+- └── `style_*.css`                       # CSS stylesheet
+
+
+---
+
+## Setup
+
 1. Clone the repository
 2. Install dependencies:
 ```bash
@@ -43,26 +81,22 @@ SENDER_PASSWORD=your-app-specific-password
 ```bash
 python database.py
 ```
-5. Start the server:
-```bash
+
+---
+
+## Usage
+
+1. Start the server:
+```python
 python server.py
 ```
-6. Open [Login.html](http://127.0.0.1:5500/Login.html) in your browser to access the application
+2. Open [`Login`](http://127.0.0.1:5500/Login.html) page on the web
+
 
 ---
 
-### Project Structure
-- [`server.py`](server.py) - Main Flask application with API endpoints
-- [`database.py`](database.py) - Database initialization and schema
-- [`Login.html`](Login.html) - Login page
-- [`CreateAccount.html`](CreateAccount.html) - Account creation page
-- [`ForgotPassword.html`](ForgotPassword.html) - Password reset page
-- [`Details.html`](Details.html) - User account details page
-- `style_*.css` - CSS stylesheets
+## Security Features
 
----
-
-### Security Features
 - Secure password hashing with Argon2
 - Session-based authentication
 - CORS protection
@@ -73,7 +107,8 @@ python server.py
 
 ---
 
-### API Endpoints
+## API Endpoints
+
 | Endpoint              | Method | Description                  |
 | --------------------- | ------ | ---------------------------- |
 | `/create-account`     | POST   | Create new user account      |
@@ -85,15 +120,7 @@ python server.py
 
 ---
 
-### License
-MIT
+## License
 
----
+This project is licensed under the MIT License, which means you are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, as long as you include the original copyright and license notice in any copy of the software. The software is provided "as is," without warranty of any kind.
 
-### Contributing
-Feel free to submit issues and enhancement requests!
-
----
-
-### Note
-This is a testing/development project - additional security measures would be needed for production use.
