@@ -70,17 +70,32 @@
 
 ## Setup
 
-1. Clone the repository
-2. Install dependencies:
+1. **Install uv**
+	Download and install [uv](https://github.com/astral-sh/uv) from the official repository or use:
 ```bash
-pip install flask flasj-cors argon2-cffi python-dotenv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv self update
+uv python install 3.13
 ```
-3. Create a .env file with email credentials:
+
+2. **Create a virtual environment**
+```bash
+uv venv
 ```
+
+3. **Install dependencies**
+```bash
+uv pip install -e .
+```
+
+4. **Add a `.env` file**
+	- Create a file named `.env` in the project root directory.
+	- Add the following line (no quotes):
+```bash
 SENDER_EMAIL=your-email@gmail.com
 SENDER_PASSWORD=your-app-specific-password
 ```
-4. Initialize the database:
+5. Initialize the database:
 ```bash
 python database.py
 ```
