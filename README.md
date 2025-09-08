@@ -3,7 +3,7 @@
 
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/Version-1.0.0-green)
+![GitHub Release](https://img.shields.io/github/v/release/kscardinal/secure-auth-system)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/kscardinal/secure-auth-system)
 ![GitHub last commit](https://img.shields.io/github/last-commit/kscardinal/secure-auth-system)
 
