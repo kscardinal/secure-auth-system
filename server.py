@@ -12,6 +12,8 @@ from email.mime.multipart import MIMEMultipart
 import os
 from dotenv import load_dotenv
 
+
+
 # Load .env file
 load_dotenv()
 
